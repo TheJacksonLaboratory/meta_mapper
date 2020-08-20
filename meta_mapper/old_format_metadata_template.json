@@ -1,0 +1,26 @@
+{
+    "manager_user_id": "pi",
+    "user_id": "postdoc",
+    "project_name": "Nobel Prize Project (NPP)",
+    "classification": "topSecret",
+    "grant_id": "NA",
+    "notes": "Who needs notes?",
+    "request_type": "faculty",
+    "system_groups": ["jaxuser"],
+    "submitter": {
+        "fname": "post",
+        "lname": "doc",
+        "username": "pdoc",
+        "email": "post.doc@jax.org"
+    },
+    "archived_path": "/archive/faculty/pi-lab/postdoc/2019-12-31/NPP",
+    "source_path": "/tier2/pi-lab/postdoc/postdoc_NPP",
+    "when_ready_for_queue": null,
+    "when_archival_queued": null,
+    "when_archival_started": null,
+    "when_archival_completed": null,
+    "failed_count": 0,
+    "archival_status": "processing_metadata",
+    "user_metadata": {}
+}
+

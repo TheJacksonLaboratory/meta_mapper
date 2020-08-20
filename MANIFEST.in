@@ -1,0 +1,3 @@
+include meta_mapper/master_template.json
+include meta_mapper/meta_mapper_config.cfg
+include meta_mapper/old_format_metadata_template.json
