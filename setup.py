@@ -17,7 +17,7 @@ setuptools.setup(
     include_package_data=True,
     install_requires=[
         "system_groups_finder"
-    ]
+    ],
     dependency_links=[
         'git+https://github.com/TheJacksonLaboratory/system_groups_finder.git@master#egg=system_groups_finder-1.1'
     ],
