@@ -18,9 +18,11 @@ setuptools.setup(
     install_requires=[
         "system_groups_finder"
     ],
-    dependency_links=[
-        'git+https://github.com/TheJacksonLaboratory/system_groups_finder.git@master#egg=system_groups_finder-1.1'
-    ],
+    # There appear to be problems with dependency links, so for the time being, users will have to install the
+    # system_groups_finder manually, unfortunately.
+    #dependency_links=[
+    #    'git+https://github.com/TheJacksonLaboratory/system_groups_finder.git@master#egg=system_groups_finder-1.1'
+    #],
     url="https://github.com/TheJacksonLaboratory/meta_mapper", 
     packages=setuptools.find_packages(),
     python_requires='>=3.6',
