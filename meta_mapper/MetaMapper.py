@@ -577,8 +577,12 @@ class MetaMapper:
             return None
 
         # Load as json
-        with open(doc_filepath) as f:
-            curr_doc = json.load(f)
+        try:
+            with open(doc_filepath) as f:
+                curr_doc = json.load(f)
+        except:
+            # A rare few of the jsons in the archive were hand-made and malformed. Skip them.
+            return None
 
         # Convert keys to snake_case using list comprehension
         curr_doc = { self.__to_snake_case(k): v for k, v in curr_doc.items() }
