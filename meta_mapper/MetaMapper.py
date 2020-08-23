@@ -99,7 +99,7 @@ class MetaMapper:
         """
 
         # Copy the template into the new doc that will be returned after it's populated. 
-        new_doc = self.template.copy()
+        new_doc = self.get_blank_template()
 
         # Find which kind of metadata to expect from the directory path.
         category_tag = self.__get_category_tag(archive_dir)
@@ -170,6 +170,21 @@ class MetaMapper:
         self.__add_default_vals(new_doc)
 
         return new_doc
+
+
+    def get_blank_template(self):
+
+        """
+
+        Just return a fresh copy of the template.
+
+        Parameters: None
+        
+        Returns: (dic): A dict with all the keys of the template, but no values
+
+        """
+
+        return self.template.copy()        
 
 
 
