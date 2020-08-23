@@ -38,8 +38,9 @@ class MetaMapper:
         self.config.read(config_filename)
 
         # Get all the keys in the new format, discarding the values in the template's example file.
-        new_format_template = self.config["format"]["template"]
-        with open (new_format_template) as f:
+        template_filename = str(Path(root_dir, self.config["format"]["template"]))
+        assert os.path.isfile(template_filename)
+        with open (template_filename) as f:
             self.template = dict.fromkeys(json.load(f).keys(), None)
         self.user_metadata_key = self.config["format"]["user_metadata_key"]        
         self.defaults_tag = self.config["format"]["defaults_tag"]
