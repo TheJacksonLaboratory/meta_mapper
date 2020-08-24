@@ -339,6 +339,9 @@ class MetaMapper:
             if val_type == None:
                 new_doc[curr_key] = None
 
+            if val_type == "list":
+                new_doc[curr_key] = []
+
             if val_type == "dict":
                 new_doc[curr_key] = dict()
 
@@ -478,6 +481,7 @@ class MetaMapper:
                             target_key, curr_doc_val, target_key)
 
                     else:
+
                         new_doc[template_key] = curr_doc_val
 
 
@@ -598,6 +602,13 @@ class MetaMapper:
 
         Parameters:
             curr_doc (dict): The current document.
+
+
+
+
+
+
+
             doc_key (str): The document key from the config file.
 
         Returns: Value of the key in the doc as a str, or None if key not in doc.
