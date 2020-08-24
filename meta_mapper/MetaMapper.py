@@ -339,7 +339,7 @@ class MetaMapper:
                 new_doc[curr_key] = float(val)
 
             if val_type == "str":
-                if val.lower() = "none":
+                if val.lower() == "none":
                     new_doc[curr_key] = ""
                 else:
                     new_doc[curr_key] = str(val)
