@@ -321,8 +321,11 @@ class MetaMapper:
 
         for curr_key, packed_val in self.config[self.defaults_tag].items():
 
-            # Don't add the vaule if the doc already has a value for this key, unless the current value is DNF. 
-             
+            # Skip any key not in the template
+            if curr_key not in new_doc:
+                continue
+            
+            # Don't add the vaule if the doc already has a value for this key, unless the current value is DNF.              
             if curr_key in new_doc and new_doc[curr_key] and new_doc[curr_key] != "DNF":
                 continue
 
