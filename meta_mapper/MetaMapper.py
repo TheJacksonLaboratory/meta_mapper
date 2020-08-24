@@ -321,8 +321,13 @@ class MetaMapper:
 
         for curr_key, packed_val in self.config[self.defaults_tag].items():
 
-            # Don't add the vaule if the doc already has a value for this key.
-            if curr_key in new_doc and new_doc[curr_key]:
+            # Don't add the vaule if the doc already has a value for this key, unless the current value is DNF. 
+             
+            if curr_key in new_doc and new_doc[curr_key] and new_doc[curr_key] != "DNF":
+                continue
+
+            if new_doc[curr_key] == "DNF":
+                new_doc[curr_key] = ""
                 continue
 
             val_type,val = packed_val.split(':')
@@ -334,7 +339,10 @@ class MetaMapper:
                 new_doc[curr_key] = float(val)
 
             if val_type == "str":
-                new_doc[curr_key] = str(val)
+                if val.lower() = "none":
+                    new_doc[curr_key] = ""
+                else:
+                    new_doc[curr_key] = str(val)
 
             if val_type == None:
                 new_doc[curr_key] = None
