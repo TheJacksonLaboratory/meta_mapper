@@ -83,6 +83,9 @@ class MetaMapper:
         # Save the name of the directory name key
         self.dirname_key = self.config["format"]["dirname_key"]
 
+        # Values to be replaced in old metadata are in a comma separated list. Strip any whitespace
+        # from each element.
+        self.vals_to_replace = [x.strip() for x in self.config["replace_vals"]["vals_to_replace"].split(',')]
 
     def create_new_document(self, archive_dir):
 
@@ -307,10 +310,13 @@ class MetaMapper:
 
         Parse defaults from config, add to new doc.
 
-        Parses the default values in the "default_vals" section of the config file. Values in that section are
+            Parses the default values in the "default_vals" section of the config file. Values in that section are
         actually pairs delimited by a colon, in the form type:val. E.g., "int:0" means the value would
-        be zero as an integer, while "str:None" means the value is the string "None", not just None.
-        Will not add the value if the doc aalready has one.
+        be zero as an integer, but "int:None" means athe value is None if we don't have one. "str:None" means the 
+        value is an empty string. 
+
+            Even if the there is already a value, we must enforce that it is the correct type.
+        
 
         Parameters:
             new_doc (dict): The new dictionary being populated.
@@ -324,43 +330,59 @@ class MetaMapper:
             # Skip any key not in the template
             if curr_key not in new_doc:
                 continue
-            
-            # Don't add the vaule if the doc already has a value for this key, unless the current value is DNF.              
-            if curr_key in new_doc and new_doc[curr_key] and new_doc[curr_key] != "DNF":
-                continue
 
-            if new_doc[curr_key] == "DNF":
-                new_doc[curr_key] = ""
-                continue
+            # Get the default value and type that we want.
+            default_val_type,default_val = packed_val.split(':')
 
-            val_type,val = packed_val.split(':')
+            # Get the existing value
+            curr_val = new_doc[curr_key]
 
-            if val_type == "int":
-                new_doc[curr_key] = int(val)
-
-            if val_type == "float":
-                new_doc[curr_key] = float(val)
-
-            if val_type == "str":
-                if val.lower() == "none":
+            # Some docs have lists for values where they shouldn't. In such cases,
+            # Change the value to the first item in the list, or None if its empty.
+            if isinstance(curr_val, list) and default_val_type != "list":
+                if len(curr_val):
+                    curr_val = curr_val[0]
+                else:
+                    curr_val = None
+                new_doc[curr_key] = curr_val
+        
+            # Check whether doc has a valid value for this key. Change any junk values
+            # (DNF, NA, etc) to empty strings.
+            if not curr_val or (isinstance(curr_val, str) and 
+                curr_val.lower().strip() in self.vals_to_replace):
+                
+                if default_val_type == "str":
                     new_doc[curr_key] = ""
+                elif default_val_type == "int" or default_val_type == "float":
+                    new_doc[curr_key] = None
+                elif default_val_type == "list":
+                    new_doc[curr_key] = []
+                elif default_val_type == "dict":
+                    new_doc[curr_key] = {}
                 else:
-                    new_doc[curr_key] = str(val)
+                    # Control should never reach here.
+                    assert(False)
+                continue                 
 
-            if val_type == None:
-                new_doc[curr_key] = None
+            # If there is a value, insure it has the desired type
+            if curr_val:
 
-            if val_type == "list":
-                new_doc[curr_key] = []
+                # If the value is supposed to be an int, but its not, change it to an int
+                if default_val_type == "int" and not isinstance(curr_val, int):
+                    try:
+                        curr_val = int(curr_val)
+                    except:
+                        curr_val = None
+                    new_doc[curr_key] = curr_val
 
-            if val_type == "dict":
-                new_doc[curr_key] = dict()
+                # If the value is supposed to be a string, but its not, change it to a string
+                if default_val_type == "str" and not isinstance(curr_val, str):
+                    try:
+                        curr_val = str(curr_val)
+                    except:
+                        curr_val = None
+                    new_doc[curr_key] = curr_val
 
-            if val_type == bool:
-                if val.lower() == "true":
-                    new_doc[curr_key] = True
-                else:
-                    new_doc[curr_key] = False
 
 
     def __add_groups_from_doc(self, new_doc, curr_doc):
