@@ -12,3 +12,32 @@ $ python3 -m venv myenv
 $ source myenv/bin/activate
 (myenv) $ python -m pip install git+https://<github_username>:<access_token>@github.com/TheJacksonLaboratory/system_groups_finder
 ```
+
+
+## The configuration file
+
+The mapper is highly configurable, and as such, most of it's behavior is controlled within the [meta_mapper_config](https://github.com/TheJacksonLaboratory/meta_mapper/blob/master/meta_mapper/meta_mapper_config.cfg) file. Please see the comments in the file for more details.
+
+
+## Usage
+The meta_mapper has a module name MetaMapper, which has two public methods: 
+```
+
+     |  create_new_document(self, archive_dir)
+     |      Build a new metadata document from jsons in an archive directory.
+     |
+     |      The document will contain keys in the template, with values populated by searching
+     |      the jsons in the given directory.
+     |
+     |      Parameters: archive_dir (str): Absolute path to a directory in the archive.
+     |
+     |      Returns: new metadata document as a dict.
+     |
+     |  get_blank_template(self)
+     |      Just return a fresh copy of the template.
+     |
+     |      Parameters: None
+     |
+     |      Returns: (dic): A dict with all the keys of the template, but no values
+     |
+```
