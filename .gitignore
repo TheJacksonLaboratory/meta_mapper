@@ -49,3 +49,6 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 
+# local code 
+meta_mapper/test_mapper.py
+
