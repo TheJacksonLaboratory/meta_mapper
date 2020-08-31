@@ -25,7 +25,7 @@ class MetaMapper:
 
         """
 
-        Load new document example and get field mapping from config file.
+        Load the new template, field mapping, and formatting instructions from the config file.
 
         """
 
