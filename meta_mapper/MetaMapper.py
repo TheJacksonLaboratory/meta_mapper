@@ -430,8 +430,8 @@ class MetaMapper:
         if new_doc[self.system_groups_key]:
             return
 
-        # If the directory doesn't start with the archive root or isn't a valid directory, do nothing.
-        if not archive_dir.startswith(self.archive_root) or not os.path.isdir(archive_dir):
+        # If the directory isn't a valid directory, do nothing.
+        if not os.path.isdir(archive_dir):
             return
 
         new_doc[self.system_groups_key] = self.system_groups_finder.search_archived_path_for_group_name(archive_dir, "system_groups")
