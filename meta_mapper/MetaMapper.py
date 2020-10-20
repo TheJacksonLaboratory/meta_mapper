@@ -87,6 +87,7 @@ class MetaMapper:
         # from each element.
         self.vals_to_replace = [x.strip() for x in self.config["replace_vals"]["vals_to_replace"].split(',')]
 
+
     def create_new_document(self, archive_dir):
 
         """
@@ -165,10 +166,8 @@ class MetaMapper:
         # Add system groups if needed
         self.__add_groups_from_path(new_doc, archive_dir)
 
-        # For now, limit any docs with multiple source paths to just the first one
-        srcs = new_doc[self.source_path_key]
-        if type(srcs) == list and len(srcs) > 0:
-            new_doc[self.source_path_key] = srcs[0]
+        # Make any needed correcttions/adjustments to the source path
+        self.__adjust_source_path(new_doc)
 
         # Add any known constants
         self.__add_default_vals(new_doc)
@@ -516,6 +515,33 @@ class MetaMapper:
                     else:
 
                         new_doc[template_key] = curr_doc_val
+
+
+    def __adjust_source_path(self, new_doc):
+
+        """
+
+        Make any needed correcttions/adjustments to the source path.
+
+        Parameters:
+            new_doc (dict): The new document being built
+
+        Returns:
+            None
+
+        """
+
+        # For now, limit any docs with multiple source paths to just the first one
+        srcs = new_doc[self.source_path_key]
+        if type(srcs) == list and len(srcs) > 0:
+            new_doc[self.source_path_key] = srcs[0]
+
+        # See if the config file has any changes we need to make to the root of the path.
+        curr_src_path = new_doc[self.source_path_key] 
+        for old_root, new_root in self.config["source_path_changes"].items():
+            if curr_src_path.startswith(old_root):
+                new_src_path = curr_src_path.replace(old_root, new_root)
+                new_doc[self.source_path_key] = new_src_path
 
 
     def __expand_dirname_for_filename(self, doc_filename, archive_dir):
