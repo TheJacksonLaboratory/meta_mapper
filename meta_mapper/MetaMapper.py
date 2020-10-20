@@ -293,8 +293,8 @@ class MetaMapper:
         if new_doc[self.date_key]:
             return        
 
-        # If the directory doesn't start with the archive root or isn't a valid directory, do nothing.
-        if not archive_dir.startswith(self.archive_root) or not os.path.isdir(archive_dir):
+        # If the directory isn't a valid directory, do nothing.
+        if not os.path.isdir(archive_dir):
             return
 
         # Get the directory's lat modified, convert to datetime as a string
@@ -635,13 +635,6 @@ class MetaMapper:
 
         Parameters:
             curr_doc (dict): The current document.
-
-
-
-
-
-
-
             doc_key (str): The document key from the config file.
 
         Returns: Value of the key in the doc as a str, or None if key not in doc.
