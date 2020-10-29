@@ -531,8 +531,12 @@ class MetaMapper:
 
         """
 
-        # For now, limit any docs with multiple source paths to just the first one
+        # For now, limit any docs with multiple source paths to just the first one. But if 
+        # there are none, do nothing.
         srcs = new_doc[self.source_path_key]
+        if not srcs:
+            return
+
         if type(srcs) == list and len(srcs) > 0:
             new_doc[self.source_path_key] = srcs[0]
 
