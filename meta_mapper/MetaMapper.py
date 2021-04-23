@@ -99,7 +99,8 @@ class MetaMapper:
 
         Parameters: archive_dir (str): Absolute path to a directory in the archive.
 
-        Returns: new metadata document as a dict.
+        Returns:
+            new_doc (dict): New metadata document, OR error string starting with "ERROR"
 
         """
 
@@ -109,7 +110,9 @@ class MetaMapper:
         # Find which kind of metadata to expect from the directory path.
         category_tag = self.__get_category_tag(archive_dir)
         if not category_tag:
-            return # This kind of metadata is not yet handled.
+            # This kind of metadata is not yet handled.
+            return "ERROR: could not determine metadata category"
+
 
         # Track whether we found a useable metadata document
         self.useable_doc_found = False
@@ -149,7 +152,7 @@ class MetaMapper:
 
         # Do nothing if the archive dir had no useable metadata document
         if not self.useable_doc_found:
-            return None
+            return "ERROR: No useable metata doc found"
 
         # Add archive_path if needed
         self.__add_archive_path(new_doc, archive_dir)
