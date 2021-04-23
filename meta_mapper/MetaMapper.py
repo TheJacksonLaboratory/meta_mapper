@@ -650,8 +650,17 @@ class MetaMapper:
         try:
             with open(doc_filepath) as f:
                 curr_doc = json.load(f)
+        except json.decoder.JSONDecodeError as e:
+            # A rare few of the jsons in the archive were hand-made and malformed. Specifically, 
+            # they are missing a closing brace. Load the file as a string, add the close brace, 
+            # then load the string as json.
+            try:
+                with open(doc_filepath) as f:
+                    curr_doc = json.loads(f.read() + '}')
+            except:
+                # If it still didn't work, skip
+                return None
         except:
-            # A rare few of the jsons in the archive were hand-made and malformed. Skip them.
             return None
 
         # Convert keys to snake_case using list comprehension
