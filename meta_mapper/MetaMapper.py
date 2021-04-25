@@ -126,6 +126,8 @@ class MetaMapper:
             # Load json doc with keys converted to snake_case.
             curr_doc = self.__get_curr_doc(archive_dir, doc_filename)
 
+            # RANDOM COMMENT, TRYING TO FORCE UPDATE
+
             # Strip any dollar signs ('$') from the keys.
             curr_doc = self.__strip_dollar_signs_from_keys(curr_doc)
 
