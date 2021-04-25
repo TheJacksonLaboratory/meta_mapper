@@ -125,6 +125,10 @@ class MetaMapper:
 
             # Load json doc with keys converted to snake_case.
             curr_doc = self.__get_curr_doc(archive_dir, doc_filename)
+
+            # Strip any dollar signs ('$') from the keys.
+            curr_doc = self.__strip_dollar_signs_from_keys(curr_doc)
+
             if not curr_doc:
                 # doc not found in this directory
                 continue
@@ -627,13 +631,13 @@ class MetaMapper:
 
         """"
         
-        Seek the given file and load it as json with snake_case keys. Erase '$' signs.
+        Seek the given file and load it as json with snake_case keys.
 
         Parameters:
             archive_dir (str): Absolute path of the directory being searched.
             doc_filename (str): Name of metadata json file to look for in the directory.
 
-        Returns: dict of file contents with keys in snake_case and no '$' signs, or None if not found.
+        Returns: dict of file contents with keys in snake_case, or None if not found.
 
         """
 
@@ -666,8 +670,6 @@ class MetaMapper:
         # Convert keys to snake_case using list comprehension
         curr_doc = { self.__to_snake_case(k): v for k, v in curr_doc.items() }
 
-        # Remove '$' from keys
-        curr_doc = { k.replace('$', ''): v for k, v in curr_doc.items() }
         return curr_doc
         
 
@@ -713,6 +715,31 @@ class MetaMapper:
 
         val = self.sub_dicts[top_key][sub_key]
         return val
+
+
+    def __strip_dollar_signs_from_keys(self, curr_doc):
+
+        """
+
+        Remove dollar sign from keys.
+
+        Parameters: curr_doc (dict): The given metadata doc
+
+        Returns:
+            curr_doc (dict): The document, with dollar signs removed from keys
+
+        """
+
+        new_doc = {}
+
+        for key, val in curr_doc.items():
+            if '$' in key:
+                new_key = key.replace('$', '')
+                new_doc[new_key] = val
+            else:
+                new_doc[key] = val
+
+        return new_doc
 
 
     def __to_snake_case(self, val):
