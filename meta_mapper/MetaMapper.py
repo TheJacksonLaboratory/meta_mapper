@@ -627,13 +627,13 @@ class MetaMapper:
 
         """"
         
-        Seek the given file and load it as json with snake_case keys.
+        Seek the given file and load it as json with snake_case keys. Erase '$' signs.
 
         Parameters:
             archive_dir (str): Absolute path of the directory being searched.
             doc_filename (str): Name of metadata json file to look for in the directory.
 
-        Returns: dict of file contents with keys in snake_case, or None if not found.
+        Returns: dict of file contents with keys in snake_case and no '$' signs, or None if not found.
 
         """
 
@@ -666,6 +666,8 @@ class MetaMapper:
         # Convert keys to snake_case using list comprehension
         curr_doc = { self.__to_snake_case(k): v for k, v in curr_doc.items() }
 
+        # Remove '$' from keys
+        curr_doc = { k.replace('$', ''): v for k, v in curr_doc.items() }
         return curr_doc
         
 
