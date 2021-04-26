@@ -730,28 +730,46 @@ class MetaMapper:
 
         """
 
-        new_doc = {}
+        if type(curr_doc) == str:
+            return curr_doc.replace('$', '')
 
-        for key, val in curr_doc.items():
-
-            # Recursively call this method on any sub-dicts
-            if type(val) == dict:
-                val = self.__strip_dollar_signs_from_keys(val)
-
-            if type(val) == list:
-                new_val_list = []
+        if type(curr_doc) == list:
+            new_val_list = []
                 for curr_val in val:
                     new_curr_val = self.__strip_dollar_signs_from_keys(curr_val)
                     new_val_list.append(new_curr_val)
+            return new_val_list
 
-            # Strip any dollar signs in the key
-            if '$' in key:
-                new_key = key.replace('$', '')
-                new_doc[new_key] = val
-            else:
-                new_doc[key] = val
+        if type(curr_doc) == dict:
+            new_doc = {}
+            for key, val in curr_doc.items():
 
-        return new_doc
+                # Recursively call this method on any sub-dicts
+                if type(val) == dict:
+                    val = self.__strip_dollar_signs_from_keys(val)
+
+                # Iterate over any lists, again recursively calling this function
+                if type(val) == list:
+                    new_val_list = []
+                    for curr_val in val:
+                        new_curr_val = self.__strip_dollar_signs_from_keys(curr_val)
+                        new_val_list.append(new_curr_val)
+
+        
+                # Strip any dollar signs in the key
+                if '$' in key:
+                    new_key = key.replace('$', '')
+                    new_doc[new_key] = val
+                else:
+                    new_doc[key] = val
+
+            return new_doc
+
+        # For all else, try to convert to str.
+        if type(curr_doc) == str:
+            return curr_doc.replace('$', '')
+        else:
+            return str(curr_doc).replace('$', '')        
 
 
     def __to_snake_case(self, val):
