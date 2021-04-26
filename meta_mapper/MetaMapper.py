@@ -733,6 +733,12 @@ class MetaMapper:
         new_doc = {}
 
         for key, val in curr_doc.items():
+
+            # Recursively call this method on any sub-dicts
+            if type(val) == dict:
+                val = self.__strip_dollar_signs_from_keys(val)
+
+            # Strip any dollar signs in the key
             if '$' in key:
                 new_key = key.replace('$', '')
                 new_doc[new_key] = val
