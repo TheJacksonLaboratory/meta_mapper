@@ -738,6 +738,12 @@ class MetaMapper:
             if type(val) == dict:
                 val = self.__strip_dollar_signs_from_keys(val)
 
+            if type(val) == list:
+                new_val_list = []
+                for curr_val in val:
+                    new_curr_val = self.__strip_dollar_signs_from_keys(curr_val)
+                    new_val_list.append(new_curr_val)
+
             # Strip any dollar signs in the key
             if '$' in key:
                 new_key = key.replace('$', '')
