@@ -735,7 +735,7 @@ class MetaMapper:
 
         if type(curr_doc) == list:
             new_val_list = []
-            for curr_val in val:
+            for curr_val in curr_doc:
                 new_curr_val = self.__strip_dollar_signs_from_keys(curr_val)
                 new_val_list.append(new_curr_val)
             return new_val_list
