@@ -92,7 +92,7 @@ class MetaMapper:
 
         """
 
-        Build a new metadata document from jsons in an archive directory.
+        Build a new metadata document from json files in an archive directory.
 
         The document will contain keys in the template, with values populated by searching 
         the jsons in the given directory.
@@ -182,6 +182,91 @@ class MetaMapper:
         return new_doc
 
 
+    def create_new_document_from_given_doc(self, old_doc):
+
+        """
+
+        Build a new metadata document from an existing document.
+
+        The document will contain keys in the standard template, with values populated 
+        by mapping fields from the old document.
+
+        Parameters: old_doc (dict): The existing metadata dict
+
+        Returns:
+            new_doc (dict): New metadata document, OR error string starting with "ERROR"
+
+        """
+
+        # Convert all top level keys in old doc to snake_case.
+        old_doc = { self.__to_snake_case(k): v for k, v in old_doc.items() }
+
+
+        # Strip any dollar signs ('$') from the keys in the old doc.
+        old_doc = self.__strip_dollar_signs_from_keys(old_doc)
+
+        # Clear any saved sub-dictionaries from previous documents. These are used in the
+        # __get_curr_doc_val method.
+        self.sub_dicts = {}
+
+        # Copy the template into the new doc that will be returned after it's populated.
+        new_doc = self.get_blank_template()
+
+        # Get the archived path
+        try:
+            archive_dir = old_doc[self.archive_path_key]
+        except:
+            return "ERROR: archived path not found in old document."
+        
+        # Find which kind of metadata to expect from the directory path. This is what we'll
+        # call the "category". E.g. "gt", "legacy_pacbio", "singlecell", etc.
+        category_tag = self.__get_category_tag(archive_dir)
+        if not category_tag:
+            # This kind of metadata is not yet handled.
+            return "ERROR: could not determine metadata category"
+
+        # Match every type of doc_tag ("gt_metadata", "metadata ", or "archived_json") with
+        # the above found category to obtain a possible section name, which is a section in the 
+        # config file, if it exists.
+        for doc_tag in self.config["doc_names"].keys():
+
+            # Get the section of the config file to seek by combining the category and doc tags.
+            section_tag = category_tag + '_' + doc_tag
+            if section_tag not in self.config:
+                # This kind of metadata doc is not yet handled for this category
+                continue
+
+            # Add vals from curr doc to new doc
+            try:
+                self.__add_vals_from_curr_doc(new_doc, section_tag, old_doc)
+            except ValueError as e:
+                print(f"Key error for {archive_dir}:new_doc {str(e)}")
+
+            # Tuck old doc into user_data field, if specified in the config file and not 
+            # already added.
+            if not new_doc.get(self.user_metadata_key):
+                self.__add_user_metadata(new_doc, section_tag, old_doc)
+
+        # TBD: elim most of these
+
+        # Add the archived size
+        self.__add_archived_size(new_doc, archive_dir)
+
+        # Add the archival status
+        self.__add_archival_status(new_doc, archive_dir, from_doc=true)
+
+        # Add date if needed
+        self.__add_date(new_doc, archive_dir)
+
+        # Add the system groups if needed
+        self.__add_groups_from_doc(new_doc, old_doc)
+
+        # Add any known constants
+        self.__add_default_vals(new_doc)
+
+        return new_doc
+
+
     def get_blank_template(self):
 
         """
@@ -255,7 +340,7 @@ class MetaMapper:
         new_doc[self.archived_size_key] = archived_size
 
 
-    def __add_archival_status(self, new_doc, archive_dir):
+    def __add_archival_status(self, new_doc, archive_dir, from_doc=False):
 
         """
 
@@ -273,9 +358,8 @@ class MetaMapper:
         if not archive_dir.startswith(self.archive_root) or not os.path.isdir(archive_dir):
             return
 
-        # If it doesn't have metadata, do nothing (technically, if it doesn't have metadata, control flow
-        # won't reach this point, but that could potentially change in the future.)
-        if not self.useable_doc_found:
+        # If it doesn't have metadata, and we're adding status to an existing doc, do nothing.
+        if not self.useable_doc_found and not from_doc:
             return
 
         new_doc[self.archival_status_key] = self.archival_status_done_msg
@@ -405,6 +489,14 @@ class MetaMapper:
 
         """
 
+        # If the existing system_groups are a list and have one or more entries, copy that list
+        # to the new_doc and stop.
+        old_groups = curr_doc.get(self.system_groups_key)
+        if isinstance(old_groups, list) and len(old_groups) >= 1:
+            new_doc[self.system_groups_key] = old_groups
+            return
+
+        # Couldn't get useable system_groups from the system_groups field in the old doc.
         # Scan the whole doc to find info about groups.
         groups = self.system_groups_finder.get_groups_from_entire_doc(curr_doc)
 
