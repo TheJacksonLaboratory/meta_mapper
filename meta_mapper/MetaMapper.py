@@ -767,7 +767,7 @@ class MetaMapper:
         curr_doc = { self.__to_snake_case(k): v for k, v in curr_doc.items() }
 
         # Remove unwanted keys
-        for key in self.remove_keys:
+        for key in self.keys_to_remove:
             if key in curr_doc:
                 del curr_doc[key]
 
@@ -815,7 +815,7 @@ class MetaMapper:
             self.sub_dicts[top_key] = { self.__to_snake_case(k): v for k, v in curr_doc[top_key].items() }        
 
             # Remove unwanted keys from the sub_dict:
-            for bad_key in self.remove_keys:
+            for bad_key in self.keys_to_remove:
                 if bad_key in self.sub_dicts[top_key]:
                     del self.sub_dicts[top_key][bad_key]
 
