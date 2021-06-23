@@ -87,6 +87,9 @@ class MetaMapper:
         # from each element.
         self.keys_to_remove = [x.strip() for x in self.config["remove_keys"]["keys_to_remove"].split(',')]
 
+        # Some docs are known to contain sub-dictionaries we need to remove keys from.
+        self.sub_dict_to_prune = self.config["remove_keys"]["sub_dict_to_prune"]
+
         # Values to be replaced in old metadata are in a comma separated list. Strip any whitespace
         # from each element.
         self.vals_to_replace = [x.strip() for x in self.config["replace_vals"]["vals_to_replace"].split(',')]
@@ -133,6 +136,9 @@ class MetaMapper:
             if not curr_doc:
                 # doc not found in this directory
                 continue
+
+            # Immediately remove unwanted keys
+            self.__prune_keys(curr_doc)
 
             # Strip any dollar signs ('$') from the keys.
             curr_doc = self.__strip_dollar_signs_from_keys(curr_doc)
@@ -766,11 +772,6 @@ class MetaMapper:
         # Convert keys to snake_case using list comprehension
         curr_doc = { self.__to_snake_case(k): v for k, v in curr_doc.items() }
 
-        # Remove unwanted keys
-        for key in self.keys_to_remove:
-            if key in curr_doc:
-                del curr_doc[key]
-
         return curr_doc
         
 
@@ -814,13 +815,28 @@ class MetaMapper:
         if top_key not in self.sub_dicts:
             self.sub_dicts[top_key] = { self.__to_snake_case(k): v for k, v in curr_doc[top_key].items() }        
 
-            # Remove unwanted keys from the sub_dict:
-            for bad_key in self.keys_to_remove:
-                if bad_key in self.sub_dicts[top_key]:
-                    del self.sub_dicts[top_key][bad_key]
-
         val = self.sub_dicts[top_key][sub_key]
         return val
+
+
+    def __prune_keys(self, curr_doc):
+
+        """
+
+        Remove keys from some docs or sub-dictionaries
+
+        Parameters: curr_doc (dict): The given metadata doc
+
+        Returns:
+            None
+
+        """
+
+        # See if the doc contains a sub-dictionary that we know we'll need to prune keys from.
+        if self.sub_dict_to_prune in curr_doc:
+            # Remove all unwanted keys from this dict.
+            for bad_key in self.keys_to_remove:
+                curr_doc[self.sub_dict_to_prune].pop(bad_key, None)
 
 
     def __strip_dollar_signs_from_keys(self, curr_doc):
